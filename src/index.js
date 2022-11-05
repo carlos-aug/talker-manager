@@ -2,7 +2,9 @@ const fs = require('fs').promises;
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
-const { generateToken } = require('./middlewares');
+const { generateToken, 
+  validateEmailAndPassword, 
+} = require('./middlewares');
 
 const talker = path.resolve(__dirname, './talker.json');
 
@@ -37,9 +39,9 @@ app.get('/talker/:id', async (req, res) => {
   return res.status(HTTP_OK_STATUS).json(findData); 
 });  
 
-app.post('/login', async (_req, res) => {
-  const cripto = generateToken();
-  res.status(HTTP_OK_STATUS).json({ token: cripto });
+app.post('/login', validateEmailAndPassword, async (_req, res) => {
+  const crypto = generateToken();
+  res.status(HTTP_OK_STATUS).json({ token: crypto });
 });
 
 app.listen(PORT, () => {
