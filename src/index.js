@@ -2,8 +2,14 @@ const fs = require('fs').promises;
 const path = require('path');
 const express = require('express');
 const bodyParser = require('body-parser');
-const { generateToken, 
-  validateEmailAndPassword, 
+const { generateToken,
+  validateEmailAndPassword,
+  validateToken,
+  validateName,
+  validateAge,
+  validateTalk,
+  validateWatchedAt,
+  validateRate,
 } = require('./middlewares');
 
 const talker = path.resolve(__dirname, './talker.json');
@@ -42,6 +48,22 @@ app.get('/talker/:id', async (req, res) => {
 app.post('/login', validateEmailAndPassword, async (_req, res) => {
   const crypto = generateToken();
   res.status(HTTP_OK_STATUS).json({ token: crypto });
+});
+
+app.post('/talker', validateToken,
+validateName,
+validateAge,
+validateTalk,
+validateWatchedAt,
+validateRate, async (req, res) => {
+  const palestrante = req.body;
+  const dataTalker = await fs.readFile(talker, 'utf-8');
+  const result = JSON.parse(dataTalker);
+  const index = result[result.length - 1].id + 1;
+  const newObjPalestrante = { id: index, ...palestrante };
+  const dataTalkerAndPalestrante = [...result, newObjPalestrante];
+  await fs.writeFile(talker, JSON.stringify(dataTalkerAndPalestrante));
+  res.status(201).json(newObjPalestrante);
 });
 
 app.listen(PORT, () => {
