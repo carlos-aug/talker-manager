@@ -87,6 +87,17 @@ app.put('/talker/:id',
     res.status(200).json(fileId);
 });
 
+app.delete('/talker/:id', validateToken, async (req, res) => {
+  const { id } = req.params;
+  const dataTalker = await fs.readFile(talker, 'utf-8');
+  const newFile = JSON.parse(dataTalker);
+  const filterTalker = newFile.filter((file) => file.id !== Number(id));
+
+  await fs.writeFile(talker, JSON.stringify(filterTalker));
+
+  res.sendStatus(204);  
+});
+
 app.listen(PORT, () => {
   console.log('Online');
 });
