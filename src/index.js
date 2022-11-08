@@ -66,6 +66,27 @@ validateRate, async (req, res) => {
   res.status(201).json(newObjPalestrante);
 });
 
+app.put('/talker/:id', 
+  validateToken,
+  validateName,
+  validateAge,
+  validateTalk,
+  validateWatchedAt,
+  validateRate,
+  async (req, res) => {
+    const { id } = req.params;
+    const infosBody = req.body;
+    const dataTalker = await fs.readFile(talker, 'utf-8');
+    const newFile = JSON.parse(dataTalker);
+    const fileId = { id: Number(id), ...infosBody };
+    const editTalker = newFile
+      .map((file) => (file.id === Number(id) ? { id: file.id, ...fileId } : file));
+
+    await fs.writeFile(talker, JSON.stringify(editTalker));
+
+    res.status(200).json(fileId);
+});
+
 app.listen(PORT, () => {
   console.log('Online');
 });
